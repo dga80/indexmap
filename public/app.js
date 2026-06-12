@@ -259,21 +259,31 @@ function applyFiltersAndRender() {
 function renderResults() {
   resultsContainer.innerHTML = '';
   
-  const total = filteredItems.length;
-  resultsCount.textContent = `Mostrando ${total} resultado${total === 1 ? '' : 's'}`;
+  const isSearching = searchQuery.trim().length > 0 || filterOrigin !== 'all' || filterType !== 'all';
 
-  // If no items
-  if (total === 0) {
-    const isSearching = searchQuery.trim().length > 0 || filterOrigin !== 'all' || filterType !== 'all';
-    renderEmptyState(isSearching);
+  if (!isSearching) {
+    resultsCount.style.display = 'none';
+    renderWelcomeState();
     return;
   }
 
-  // Only render the first 250 items to avoid DOM lag, let the user filter down
-  const itemsToRender = filteredItems.slice(0, 250);
+  resultsCount.style.display = 'block';
+  const total = filteredItems.length;
   
-  if (filteredItems.length > 250) {
-    resultsCount.textContent = `Mostrando primeros 250 resultados de ${total} en total (por favor escribe para filtrar más)`;
+  // If no items match the active search
+  if (total === 0) {
+    resultsCount.textContent = `Mostrando 0 resultados`;
+    renderEmptyState(true);
+    return;
+  }
+
+  // Render up to 500 items to avoid DOM lag, which is extremely plenty for a filtered list
+  const itemsToRender = filteredItems.slice(0, 500);
+  
+  if (filteredItems.length > 500) {
+    resultsCount.textContent = `Mostrando primeros 500 resultados de ${total} en total (por favor escribe para filtrar más)`;
+  } else {
+    resultsCount.textContent = `Mostrando ${total} resultado${total === 1 ? '' : 's'}`;
   }
 
   const fragment = document.createDocumentFragment();
@@ -351,6 +361,25 @@ function renderResults() {
   });
 
   resultsContainer.appendChild(fragment);
+}
+
+// Render Welcome State (Google search style)
+function renderWelcomeState() {
+  const formattedCount = allItems.length.toLocaleString();
+  resultsContainer.innerHTML = `
+    <div class="welcome-state">
+      <div class="welcome-icon-wrapper">
+        <svg class="welcome-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <path d="M11 8a3 3 0 0 0-3 3"></path>
+        </svg>
+      </div>
+      <h2>IndexMap</h2>
+      <p class="welcome-lead">Busca de forma instantánea entre <strong>${formattedCount}</strong> proyectos, pedidos y carpetas en red.</p>
+      <p class="welcome-hint">Comienza a escribir en la barra de búsqueda o selecciona un origen/tipo para filtrar y encontrar carpetas de inmediato.</p>
+    </div>
+  `;
 }
 
 // Render Empty/No Results state
