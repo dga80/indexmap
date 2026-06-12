@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Pedidos y Proyectos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Prevent theme flashing on page load
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light-theme');
+    }
+  </script>
+</head>
+<body>
+  <div class="glass-bg"></div>
+  
+  <div class="container">
+    <header class="app-header">
+      <div class="logo-area">
+        <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <path d="M11 7a4 4 0 0 0-4 4"></path>
+        </svg>
+        <div>
+          <h1>IndexMap</h1>
+          <p class="subtitle">Buscador de coincidencia de proyectos en rutas de red</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn btn-theme" aria-label="Cambiar tema">
+          <!-- Sun Icon (visible in light theme) -->
+          <svg class="icon theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon Icon (visible in dark theme) -->
+          <svg class="icon theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <div class="status-panel card">
+          <div class="status-info">
+            <div class="status-indicator">
+              <span class="indicator-dot" id="status-dot"></span>
+              <span class="status-text" id="status-text">Cargando estado...</span>
+            </div>
+            <div class="status-details">
+              <span id="item-count">0</span> elementos indexados | <span id="last-scan">Nunca</span>
+            </div>
+          </div>
+          <button id="btn-reindex" class="btn btn-secondary">
+            <svg class="icon btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            Indexar Rutas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Search and Filter Bar -->
+      <section class="search-section card">
+        <div class="search-box-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" placeholder="Buscar por código, nombre de proyecto, pedido o palabra clave..." autocomplete="off">
+          <button id="clear-search" class="clear-btn" aria-label="Limpiar búsqueda" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="filters-row">
+          <div class="filter-group">
+            <span class="filter-label">Origen:</span>
+            <div class="pill-group" id="origin-filter">
+              <button class="pill active" data-value="all">Todos</button>
+              <button class="pill" data-value="AyC">AyC</button>
+              <button class="pill" data-value="LOESS">LOESS</button>
+              <button class="pill" data-value="CESA">CESA</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Tipo:</span>
+            <div class="pill-group" id="type-filter">
+              <button class="pill active" data-value="all">Todos</button>
+              <button class="pill" data-value="folder">Carpetas</button>
+              <button class="pill" data-value="file">Archivos</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Errors/Warnings panel if paths are offline -->
+      <section id="error-panel" class="error-panel card" style="display: none;">
+        <div class="error-header">
+          <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <h3>Avisos de Red / Rutas no Accesibles</h3>
+        </div>
+        <ul id="error-list"></ul>
+      </section>
+
+      <!-- Results Info -->
+      <div class="results-meta">
+        <span id="results-count">Mostrando 0 resultados</span>
+      </div>
+
+      <!-- Results List -->
+      <section id="results-container" class="results-list">
+        <!-- Result items will be dynamically injected here -->
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando índice de proyectos...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>Rutas configuradas en el servidor:</p>
+      <ul>
+        <li><code>\\172.30.0.10\Compras\02-AyC\1-Pedidos AyC 2026</code></li>
+        <li><code>\\172.30.0.10\Compras\03-LOESS\Pedidos LOESS 2026</code></li>
+        <li><code>\\172.30.0.10\Compras\04-CESA\1-Pedidos CESA 2026</code></li>
+      </ul>
+    </footer>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

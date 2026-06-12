@@ -1,0 +1,16 @@
+{
+  "name": "index-map-search",
+  "version": "1.0.0",
+  "description": "Buscador de proyectos en rutas de red UNC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
