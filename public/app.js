@@ -376,7 +376,7 @@ function renderWelcomeState() {
         </svg>
       </div>
       <h2>IndexMap</h2>
-      <p class="welcome-lead">Busca de forma instantánea entre <strong>${formattedCount}</strong> proyectos, pedidos y carpetas en red.</p>
+      <p class="welcome-lead">Busca de forma instantánea entre <strong>${formattedCount}</strong> proyectos,<br>pedidos y carpetas en red.</p>
       <p class="welcome-hint">Comienza a escribir en la barra de búsqueda o selecciona un origen/tipo para filtrar y encontrar carpetas de inmediato.</p>
     </div>
   `;
